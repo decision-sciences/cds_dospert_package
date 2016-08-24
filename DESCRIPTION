@@ -1,0 +1,22 @@
+Package: dospert
+Type: Package
+Title: dospert R package
+Version: 0.5
+Date: 2015-07-07
+Author: Geun Hae Ahn, Salah Chafik 
+Maintainer: Geun Hae Ahn <ga2394@columbia.edu>, Salah Chafik <sc3568@columbia.edu>
+Description: Read, reformat and analyze DOSPERT data easily. Score any or all 5 of the domain-specific risk-taking scales for individual survey takers and print code to create latex or html output. 
+Imports: 
+    plyr,
+    dplyr,
+    readr,
+    reshape2,
+Depends: R (>= 3.1.0), plyr,
+    dplyr,
+    readr,
+    reshape2
+License: open
+LazyData: TRUE
+Suggests: knitr,
+    XML
+VignetteBuilder: knitr
