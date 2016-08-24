@@ -16,19 +16,15 @@
 
 d_score <- function(df, var, file_type = "csv"){
 
-  # component functions
-    # uniqR_csv
-    # uniqR_xml
 
-  # for .csv, use the identified variable as unique_id and remove the first row
   uniqR_csv <- function(df, var) {
-    df <- df %>% rename_(unique_id = as.symbol(var))
+    df <- df %>% rename_(unique_ID = as.symbol(var))
     df <- df[-1, ]
   }
 
   # for .xml, use the identified variable as unique_id
   uniqR_xml <- function(df, var){
-    df <- df %>% rename_(unique_id = as.symbol(var))
+    df <- df %>% rename_(unique_ID = as.symbol(var))
   }
 
   wideformat <- function(df, var, file_type){
@@ -41,41 +37,22 @@ d_score <- function(df, var, file_type = "csv"){
     return(df)
   }
 
-  d_clean <- function(df, var, file_type) {
+  d_clean <- function(df, var, file_type){
 
-
-
-    # take dataframe and subset only the columns of responses
-    # to risk- questions and make sure that they are in numeric
-    # format. Then, link unique_id and responses back as identifier.
-
-    # df should be contain only rows of responses
-    # column names of risk-responses should start with first three
-    # characters of the domain followed by RT, RB, RP
-    # df should have a column named 'unique_id', uniquely identifying the
-    # survey taker.
-
-
-    # full.panel separates benefit/taking/perception questions and
-    # merge them by unique_id, domain and question number
-    # and add a numeric id by unique_id
-
+    # for .csv, use the identified variable as unique_ID and remove the first row (variable name,)
     full.panel <- function(df){
-
-      # make sure factors are correctly converted into numeric format
-      # used in [selectcol] function
 
       fac_friendly <- function(x) {
         x <- as.numeric(as.character(x))
       }
       selectcol <- function(df){
-        
+
         pat = "[a-z]{3}[A-Z]{2}_[0-9]{1}|unique_ID"
         df <- df[ , grepl( pat, colnames(df))]
-        
+
         df[ , !(colnames(df) == "unique_ID")] <- df %>%
           select(-unique_ID) %>% mutate_each(funs(fac_friendly))
-        
+
         ## making sure correct type of conversion
         return(df)
       }
@@ -84,46 +61,45 @@ d_score <- function(df, var, file_type = "csv"){
       # changes input df into longform and identifies the question
       # domain, number and type (e.g. fin 6 RT, 6th question in
       # finance domain, of Risk Taking)
-      panelform <- function(df, var) {
-        df <- df %>% select( unique_id, contains(paste0(var, "_")))
-        df <- melt(df, id="unique_id", value.name = var)
-        df <- mutate(df, domain = substr(variable, 1, 3), Qnumber=substr(variable, 7, 7))
-        df <- select(df, -variable)
+      panelform <- function(df) {
+        wide <- reshape2::melt(df, id.vars = "unique_ID")
+        wide$domain <- substr(wide$variable, 1, 3)
+        wide$Qnumber <- substr(wide$variable, 7, 7)
+        wide$type <- substr(wide$variable, 4, 5)
+
+        wide_RB <- wide %>% filter(type == "RB") %>% select(-variable, -type) %>%
+          rename(RB = value)
+        wide_RP <- wide %>% filter(type == "RP") %>% select(-variable, -type) %>%
+          rename(RP = value)
+        wide_RT <- wide %>% filter(type == "RT") %>% select(-variable, -type) %>%
+          rename(RT = value)
+
+        l = list(wide_RB, wide_RT, wide_RP)
+        df <- join_all(l, type = "full") %>% select(unique_ID, domain, Qnumber, RB, RP, RT)
+        rm(wide)
+
+        df <- df %>% arrange(unique_ID, domain, Qnumber)
+
         return(df)
       }
 
-      df <- selectcol(df)
-      benefit <- panelform(df, "RB")
-      taking <- panelform(df, "RT")
-      perception <- panelform(df, "RP")
-
-      df <- Reduce(function(x,y) merge(x, y, by=c("unique_id", "domain", "Qnumber"),
-                                       all=TRUE), list(taking, perception, benefit))
-      df <- mutate(df, id=as.numeric(factor(unique_id)))
+      df <- panelform(selectcol(df))
+      # df <- mutate(df, id=as.numeric(factor(unique_ID)))
       return(df)
     }
 
 
-    df <- dplyr:: tbl_df(df)
-
     if (file_type == "csv") {
-      df <- uniqR_csv(df, var)
-      dat <- full.panel(df)
-      dat$sum <- rowSums(cbind(dat$RT, dat$RP, dat$RB))
-      dat_group <- dat %>% group_by(id) %>% dplyr::mutate(group_sum = sum(sum)) %>%
-        filter(!is.na(group_sum)) %>% select(-sum, -group_sum)
-      dat <- ungroup(dat_group)
-      return(dat)
-    } else if (file_type == "xml"){
-      df <- uniqR_xml(df, var)
-      dat <- full.panel(df)
-      dat$sum <- rowSums(cbind(dat$RT, dat$RP, dat$RB))
-      dat_group <- dat %>% group_by(id) %>% dplyr::mutate(group_sum = sum(sum)) %>%
-      filter(!is.na(group_sum)) %>% select(-sum, -group_sum)
-      dat <- ungroup(dat_group)
-      return(dat)
+      df <- full.panel(uniqR_csv(df, var))
+      return(df)
+
+    } else if (file_type == "xml") {
+      df <- full.panel(uniqR_xml(df, var))
+      return(df)
+
     }
   }
+
 
   format.result <- function(df){
     result <- attr(df, "split_labels")
@@ -133,8 +109,8 @@ d_score <- function(df, var, file_type = "csv"){
       result$RP[i] <- df[[i]]$coefficients[3]
     }
 
-    result <- merge(result, idlist, by="id") %>%
-      select(unique_id, domain, int, RB, RP)
+    result <- merge(result, idlist, by="unique_ID") %>%
+      select(unique_ID, domain, int, RB, RP)
 
     return(result)
   }
@@ -142,11 +118,10 @@ d_score <- function(df, var, file_type = "csv"){
   if(file_type != "csv" & file_type != "xml"){
     print("file_type should be either .csv or .xml")
   } else{
-    wide_temp <- wideformat(df, var, file_type)
     clean_df <- d_clean(df, var, file_type)
-    reg <- dlply(clean_df, c("id", "domain"), function(data) lm(RT ~ RB + RP, data = data))
+    reg <- dlply(clean_df, c("unique_ID", "domain"), function(data) lm(RT ~ RB + RP, data = data))
     domainlist <- distinct(select(clean_df, domain))
-    idlist <- unique(select(clean_df, unique_id, id))
+    idlist <- unique(select(clean_df, unique_ID))
     reg_result <- format.result(reg)
     split <- split(reg_result, reg_result$domain)
     list_df <- list()
@@ -156,8 +131,8 @@ d_score <- function(df, var, file_type = "csv"){
     for (i in 1:nrow(domainlist)){
       temp <- as.data.frame(split[i])[, -2]
 
-      names(temp) <- ifelse(stringr::str_detect(names(temp), "unique_id"),
-                            "unique_id", names(temp))
+      names(temp) <- ifelse(stringr::str_detect(names(temp), "unique_ID"),
+                            "unique_ID", names(temp))
       assign(paste0("coef_", domainlist[i, ]), temp)
 
       colnames(temp)[2] <- paste0(domainlist[i, ], "_int")
@@ -167,8 +142,9 @@ d_score <- function(df, var, file_type = "csv"){
       list_df[[i]] <- temp
     }
 
-    full_coef <- Reduce(function(x,y) merge(x, y, all = TRUE, by = "unique_id"), list_df)
-    df <- merge(wide_temp, full_coef, by = "unique_id")
+    full_coef <- Reduce(function(x,y) merge(x, y, all = TRUE, by = "unique_ID"), list_df)
+    wide_temp <- wideformat(df, var, file_type)
+    df <- merge(wide_temp, full_coef, by = "unique_ID")
     return(df)
   }
 }
