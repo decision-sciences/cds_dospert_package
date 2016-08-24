@@ -12,7 +12,7 @@ make sure you have `devtools` installed and run the following code:
 
 ```r
 library(devtools)
-devtools::install_github("schafik/dospert")
+devtools::install_github("decision-sciences/cds_dospert_package")
 ```
 
 
