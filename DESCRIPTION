@@ -2,7 +2,7 @@ Package: dospert
 Type: Package
 Title: dospert R package
 Version: 0.6
-Date: 2015-07-07
+Date: 2016-08-24
 Author: Geun Hae Ahn <ga2394@columbia.edu>, Salah Chafik <sc3568@columbia.edu>
 Maintainer: Center for Decision Sciences <decision_sciences@columbia.edu>
 Description: Read, reformat and analyze DOSPERT data easily. Score any or all 5 of the domain-specific risk-taking scales for individual survey takers and print code to create latex or html output. 
