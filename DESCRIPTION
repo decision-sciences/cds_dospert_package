@@ -11,10 +11,12 @@ Imports:
     dplyr,
     readr,
     reshape2,
+    lmbeta
 Depends: R (>= 3.1.0), plyr,
     dplyr,
     readr,
-    reshape2
+    reshape2, 
+    lmbeta
 License: open
 LazyData: TRUE
 Suggests: knitr,
