@@ -67,12 +67,13 @@ d_score <- function(df, var, file_type = "csv"){
         wide$Qnumber <- substr(wide$variable, 7, 7)
         wide$type <- substr(wide$variable, 4, 5)
         
-        wide_RB <- wide %>% filter(type == "RB") %>% select(-variable, -type) %>%
-          rename(RB = value)
-        wide_RP <- wide %>% filter(type == "RP") %>% select(-variable, -type) %>%
-          rename(RP = value)
-        wide_RT <- wide %>% filter(type == "RT") %>% select(-variable, -type) %>%
-          rename(RT = value)
+        wide_RB <- wide %>% filter(type == "RB") %>% select(-variable, 
+                                                          -type) %>% dplyr::rename(RB = value)
+        wide_RP <- wide %>% filter(type == "RP") %>% select(-variable, 
+                                                          -type) %>% dplyr::rename(RP = value)
+        wide_RT <- wide %>% filter(type == "RT") %>% select(-variable, 
+                                                          -type) %>% dplyr::rename(RT = value)
+
         
         l = list(wide_RB, wide_RT, wide_RP)
         df <- join_all(l, type = "full") %>% select(unique_ID, domain, Qnumber, RB, RP, RT)
