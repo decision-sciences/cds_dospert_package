@@ -51,7 +51,7 @@ d_score <- function(df, var, file_type = "csv"){
         df <- df[ , grepl( pat, colnames(df))]
         
         df[ , !(colnames(df) == "unique_ID")] <- df %>%
-          select(-unique_ID) %>% mutate_each(funs(fac_friendly))
+          dplyr::select(-unique_ID) %>% mutate_each(funs(fac_friendly))
         
         ## making sure correct type of conversion
         return(df)
@@ -67,16 +67,16 @@ d_score <- function(df, var, file_type = "csv"){
         wide$Qnumber <- substr(wide$variable, 7, 7)
         wide$type <- substr(wide$variable, 4, 5)
         
-        wide_RB <- wide %>% filter(type == "RB") %>% select(-variable, 
+        wide_RB <- wide %>% filter(type == "RB") %>% dplyr::select(-variable, 
                                                           -type) %>% dplyr::rename(RB = value)
-        wide_RP <- wide %>% filter(type == "RP") %>% select(-variable, 
+        wide_RP <- wide %>% filter(type == "RP") %>% dplyr::select(-variable, 
                                                           -type) %>% dplyr::rename(RP = value)
-        wide_RT <- wide %>% filter(type == "RT") %>% select(-variable, 
+        wide_RT <- wide %>% filter(type == "RT") %>% dplyr::select(-variable, 
                                                           -type) %>% dplyr::rename(RT = value)
 
         
         l = list(wide_RB, wide_RT, wide_RP)
-        df <- join_all(l, type = "full") %>% select(unique_ID, domain, Qnumber, RB, RP, RT)
+        df <- join_all(l, type = "full") %>% dplyr::select(unique_ID, domain, Qnumber, RB, RP, RT)
         rm(wide)
         
         df <- df %>% arrange(unique_ID, domain, Qnumber)
@@ -114,7 +114,7 @@ d_score <- function(df, var, file_type = "csv"){
     }
     
     result <- merge(result, idlist, by="unique_ID") %>%
-      select(unique_ID, domain, int, RB, RP,R_square,Standard_RB,Standard_RP)
+      dplyr::select(unique_ID, domain, int, RB, RP,R_square,Standard_RB,Standard_RP)
     
     return(result)
   }
@@ -124,8 +124,8 @@ d_score <- function(df, var, file_type = "csv"){
   } else{
     clean_df <- d_clean(df, var, file_type)
     reg <- dlply(clean_df, c("unique_ID", "domain"), function(data) summary(lm.beta(lm(RT ~ RB + RP, data = data))))
-    domainlist <- distinct(select(clean_df, domain))
-    idlist <- unique(select(clean_df, unique_ID))
+    domainlist <- distinct(dplyr::select(clean_df, domain))
+    idlist <- unique(dplyr::select(clean_df, unique_ID))
     reg_result <- format.result(reg)
     split <- split(reg_result, reg_result$domain)
     list_df <- list()
