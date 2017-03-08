@@ -182,40 +182,52 @@ head(xmldsum)
 
 # **3) d_score**
 
-d_score takes same three arguments as d_clean, calculates the risk attitude coefficients and returns the results attached to the last columns of input dataframe. It also calculates the standardized coefficents for "(domain)_RB'', and "(domain)_RP'' which are listed as "(domain).Standard_RB'', "(domain).Standard_RB'', and the r-squared for each participant for each domain, listed as "(domain).R_square''. 
-
-The risk attitude coefficients are named "(domain)_int'', "(domain)_RB'', "(domain)_RP''
+d_score takes same three arguments as d_clean, calculates the risk attitude coefficients and returns the results attached to the last columns of input dataframe. The risk attitude coefficients are named "(domain)_int'', "(domain)_RB'', "(domain)_RP''It also calculates the standardized coefficents for "(domain)_RB'', and "(domain)_RP'' which are listed as "(domain).Standard_RB'', "(domain).Standard_RB'', and the r-squared for each participant for each domain, listed as "(domain).R_square''. 
 
 
 ```r
 csvdscore <- d_score(dcsv, "V1", file_type = "csv")
-head(csvdscore %>% dplyr::select(unique_id, fin_int, fin_RB, fin_RP))
+head(csvdscore %>% dplyr::select(unique_ID, fin_int, fin_RB, fin_RP, fin.R_square, fin.Standard_RB, fin.Standard_RP))
 ```
 
 ```
-##           unique_id    fin_int        fin_RB     fin_RP
-## 1 R_1DUdsEimDpZTP4S  0.3333333  1.142857e+00         NA
-## 2 R_1JD6kEbdEIP7Xf7 11.0000000 -1.674765e-15 -1.6666667
-## 3 R_1l5HCrHMeadd1Tj 14.0152672 -7.480916e-01 -1.8396947
-## 4 R_1LNYShwUeHQ669I  3.9465875 -5.133531e-01  0.1721068
-## 5 R_1Ns8HqGixVONb3w  2.7716895  5.605023e-01 -0.3858447
-## 6 R_24w6c78hLXWE4Xk  6.3750000  3.750000e-01 -0.8750000
+ unique_ID      fin_int        fin_RB        fin_RP fin.R_square fin.Standard_RB
+1    152068 5.893701e+00 -3.228346e-01 -4.763780e-01    0.9376136   -3.228346e-01
+2    152069 7.333333e+00 -2.500000e-01  0.000000e+00   -0.2146226    4.435103e+00
+3    152072 1.450389e-15  1.000000e+00  0.000000e+00    1.0000000    3.244752e-16
+4    152074 1.000000e+00 -2.091908e-17  4.183815e-17    0.2753623            -Inf
+5    152075 2.281690e+00  9.084507e-01 -3.239437e-01    0.2427404    8.323640e-01
+6    152076 1.000000e+00  2.465190e-31           NaN    0.2647059    5.067452e-16
+  fin.Standard_RP
+1   -6.788627e-01
+2    7.324332e-01
+3    7.166459e-17
+4             Inf
+5   -1.649440e-01
+6    1.241267e-16
 ```
 
 
 ```r
 xmldscore <- d_score(dxml, "uid", file_type = "xml")
-head(xmldscore %>% dplyr::select(unique_id, fin_int, fin_RB, fin_RP))
+head(xmldscore %>% dplyr::select(unique_ID, rec_int, rec_RB, rec_RP, rec.R_square, rec.Standard_RB, rec.Standard_RP))
 ```
 
 ```
-##                          unique_id   fin_int     fin_RB     fin_RP
-## 1 002BNAWSGQT9YFW6PYQPBJYLKYPUYJUE 3.3219512  0.7073171 -0.8000000
-## 2 08UATPZCRSKR9IMBGAX72J1SKPUSZKML 2.0735294  0.7794118 -0.3382353
-## 3                    1111111111111 0.5643564  1.0891089  0.1089109
-## 4                           123456 7.0000000 -1.0000000         NA
-## 5 13XKZCC38IPPOIWTVEN1KEBYP0DGXY93 1.7840000  0.6000000 -0.1840000
-## 6 1D9V963B9MLQWGZZKVFWBKHN6UXBVTQA 5.8181818  0.8636364 -1.0909091
+ unique_ID       rec_int        rec_RB        rec_RP rec.R_square rec.Standard_RB
+1    152068  2.400000e+00 -4.000000e-01  0.000000e+00    0.2500000    6.782330e-01
+2    152069  2.900779e-15  1.000000e+00  0.000000e+00    1.0000000    1.258875e-15
+3    152072  8.870370e+00 -9.259259e-02 -1.111111e+00    0.6125731   -6.372659e-02
+4    152074  1.000000e+00  1.485264e-30  1.359740e-16    0.3478261             Inf
+5    152075 -1.066667e+00  1.266667e+00 -3.333333e-01    0.7333333    6.333333e-01
+6    152076  3.500000e+00  1.500000e+00 -2.000000e+00    0.5833333    5.000000e-01
+  rec.Standard_RP
+1    2.449490e-01
+2    2.298380e-16
+3   -9.190780e-01
+4             Inf
+5   -4.772607e-01
+6   -7.071068e-01
 ```
 
 
