@@ -182,7 +182,7 @@ head(xmldsum)
 
 # **3) d_score**
 
-d_score takes same three arguments as d_clean, calculates the risk attitude coefficients and returns the results attached to the last columns of input dataframe. The risk attitude coefficients are named "(domain)_int'', "(domain)_RB'', "(domain)_RP''It also calculates the standardized coefficents for "(domain)_RB'', and "(domain)_RP'' which are listed as "(domain).Standard_RB'', "(domain).Standard_RB'', and the r-squared for each participant for each domain, listed as "(domain).R_square''. 
+d_score takes same three arguments as d_clean, calculates the risk attitude coefficients and returns the results attached to the last columns of input dataframe. The risk attitude coefficients are named "(domain)_int'', "(domain)_RB'', "(domain)_RP''. It also calculates the standardized coefficents for "(domain)_RB'', and "(domain)_RP'' which are listed as "(domain).Standard_RB'', "(domain).Standard_RB'', and the r-squared for each participant for each domain, listed as "(domain).R_square''. 
 
 
 ```r
